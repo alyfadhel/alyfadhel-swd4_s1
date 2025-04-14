@@ -10,7 +10,7 @@ ThemeData getDarkMode()=>ThemeData(
     backgroundColor: HexColor('#1B2529',),
     titleSpacing: 20.0,
     titleTextStyle: TextStyle(
-      fontSize: 20.0,
+      fontSize: 30.0,
       fontWeight: FontWeight.bold,
       fontFamily: 'jannah',
       color: Colors.white
@@ -92,7 +92,7 @@ ThemeData getLightMode()=>ThemeData(
     backgroundColor: Colors.white,
     titleSpacing: 20.0,
     titleTextStyle: TextStyle(
-      fontSize: 20.0,
+      fontSize: 30.0,
       fontWeight: FontWeight.bold,
       fontFamily: 'jannah',
       color: Colors.black
