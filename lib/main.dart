@@ -30,13 +30,13 @@ void main() async {
   debugPrint(token.toString());
   Widget widget;
 
-  if(onBoarding != null){
-    if(token != null){
+  if (onBoarding != null) {
+    if (token != null) {
       widget = ShopLayout();
-    }else{
+    } else {
       widget = ShopLoginScreen();
     }
-  }else{
+  } else {
     widget = OnBoardingScreen();
   }
   // await SystemChrome.setPreferredOrientations([
@@ -45,10 +45,7 @@ void main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => MyApp(
-          isDark: isDark,
-          startWidget: widget,
-      ),
+      builder: (context) => MyApp(isDark: isDark, startWidget: widget),
     ),
   );
 }
@@ -76,8 +73,13 @@ class MyApp extends StatelessWidget {
               (context) =>
                   ThemeModeCubit()..changeThemeMode(fromShared: isDark),
         ),
-        BlocProvider(create: (context) => ShopCubit(),
-        )
+        BlocProvider(
+          create:
+              (context) =>
+                  ShopCubit()
+                    ..getHomeData()
+                    ..getCategoriesHome(),
+        ),
       ],
       child: BlocConsumer<ThemeModeCubit, ThemeModeStates>(
         listener: (context, state) {},

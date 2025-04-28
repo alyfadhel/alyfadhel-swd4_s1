@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swd4_s1/core/layout/shop/controller/cubit.dart';
 import 'package:swd4_s1/core/layout/shop/controller/state.dart';
+import 'package:swd4_s1/core/shared/themes/controller/cubit.dart';
 
 class ShopLayout extends StatelessWidget {
   const ShopLayout({super.key});
@@ -19,6 +20,12 @@ class ShopLayout extends StatelessWidget {
             title: Text(
               cubit.titles[cubit.currentIndex],
             ),
+            actions: [
+              IconButton(onPressed: (){
+                ThemeModeCubit.get(context).changeThemeMode();
+              }, icon: Icon(Icons.brightness_4_outlined,),),
+              IconButton(onPressed: (){}, icon: Icon(Icons.search,),),
+            ],
           ),
           bottomNavigationBar: BottomNavigationBar(
               items: cubit.items,
