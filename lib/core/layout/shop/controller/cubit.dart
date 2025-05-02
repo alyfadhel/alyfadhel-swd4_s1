@@ -7,12 +7,15 @@ import 'package:swd4_s1/core/shared/const/constanse.dart';
 import 'package:swd4_s1/core/shared/network/remote/shop_helper.dart';
 import 'package:swd4_s1/features/home/presentation/screens/home_screen.dart';
 import 'package:swd4_s1/features/shop/categories/presentation/screens/categories_screen.dart';
+import 'package:swd4_s1/features/shop/favorites/data/favorites_model.dart';
 import 'package:swd4_s1/features/shop/favorites/presentation/screens/favorites_screen.dart';
 import 'package:swd4_s1/features/shop/home/data/model/categories_home_model.dart';
 import 'package:swd4_s1/features/shop/home/data/model/change_favorites_model.dart';
 import 'package:swd4_s1/features/shop/home/data/model/home_model.dart';
+import 'package:swd4_s1/features/shop/product_details/data/model/product_details_model.dart';
 import 'package:swd4_s1/features/shop/home/presentation/screens/shop_home_screen.dart';
 import 'package:swd4_s1/features/shop/settings/data/model/profile_model.dart';
+import 'package:swd4_s1/features/shop/settings/data/model/update_profile_model.dart';
 import 'package:swd4_s1/features/shop/settings/presentation/screens/settings_screen.dart';
 
 class ShopCubit extends Cubit<ShopStates> {
@@ -34,13 +37,29 @@ class ShopCubit extends Cubit<ShopStates> {
     SettingsScreen(),
   ];
   int currentIndex = 0;
+  int current =0;
   var nameController = TextEditingController();
   var emailController = TextEditingController();
   var phoneController = TextEditingController();
 
+  void changeSmoothIndicator(index)
+  {
+    current = index;
+    emit(ShopChangeSmoothIndicatorState());
+  }
+
   void changeBottomNav(index) {
     currentIndex = index;
     emit(ShopChangeBottomNavState());
+  }
+
+  void changeLanguage() {
+    if (language == 'ar') {
+      language = 'en';
+    } else {
+      language = 'ar';
+    }
+    emit(ShopChangeLanguageState());
   }
 
   HomeModel? homeModel;
@@ -49,7 +68,11 @@ class ShopCubit extends Cubit<ShopStates> {
   void getHomeData() {
     emit(ShopGetHomeDataLoadingState());
 
-    ShopHelper.getData(url: homeEndPoint, token: token)
+    ShopHelper.getData(
+        url: homeEndPoint,
+        token: token,
+        lang: language,
+    )
         .then((value) {
           homeModel = HomeModel.fromJson(value.data);
           debugPrint('The home is : ${value.data}');
@@ -75,11 +98,14 @@ class ShopCubit extends Cubit<ShopStates> {
           url: changeFavoritesEndPoint,
           data: {'product_id': productId},
           token: token,
+          lang: language,
         )
         .then((value) {
           changeFavoritesModel = ChangeFavoritesModel.fromJson(value.data);
           if (!changeFavoritesModel!.status) {
             favorites[productId] = !favorites[productId]!;
+          } else {
+            getFavorites();
           }
           emit(ShopChangeFavoritesHomeSuccessState(changeFavoritesModel!));
         })
@@ -89,12 +115,36 @@ class ShopCubit extends Cubit<ShopStates> {
         });
   }
 
+  FavoriteModel? favoriteModel;
+
+  void getFavorites() {
+    emit(ShopGetFavoritesHomeLoadingState());
+
+    ShopHelper.getData(
+        url: favoritesEndPoint,
+        token: token,
+        lang: language,
+    )
+        .then((value) {
+          favoriteModel = FavoriteModel.fromJson(value.data);
+          debugPrint('The Favorites Screen is: ${value.data}');
+          emit(ShopGetFavoritesHomeSuccessState());
+        })
+        .catchError((error) {
+          emit(ShopGetFavoritesHomeErrorState(error.toString()));
+          debugPrint(error.toString());
+        });
+  }
+
   CategoriesHomeModel? categoriesHomeModel;
 
   void getCategoriesHome() {
     emit(ShopGetCategoriesHomeLoadingState());
 
-    ShopHelper.getData(url: categoriesEndPoint)
+    ShopHelper.getData(
+        url: categoriesEndPoint,
+        lang: language,
+    )
         .then((value) {
           categoriesHomeModel = CategoriesHomeModel.fromJson(value.data);
           debugPrint('The Home Categories is: ${value.data}');
@@ -112,14 +162,64 @@ class ShopCubit extends Cubit<ShopStates> {
     emit(ShopGetProfileLoadingState());
 
     ShopHelper.getData(
-      url: profileEndPoint,
+        url: profileEndPoint,
+        token: token,
+        lang: language,
+    )
+        .then((value) {
+          profileModel = ProfileModel.fromJson(value.data);
+          debugPrint('The profile is: ${value.data}');
+          emit(ShopGetProfileSuccessState());
+        })
+        .catchError((error) {
+          emit(ShopGetProfileErrorState(error.toString()));
+          debugPrint(error.toString());
+        });
+  }
+
+  UpdateProfileModel? updateProfileModel;
+
+  void getUpdateProfile({
+    required String name,
+    required String email,
+    required String phone,
+  })
+  {
+    emit(ShopUpdateProfileLoadingState());
+
+    ShopHelper.putData(
+          url: updateProfileEndPoint,
+          data: {'name': name, 'email': email, 'phone': phone},
+          token: token,
+          lang: language,
+        )
+        .then((value) {
+          updateProfileModel = UpdateProfileModel.fromJSon(value.data);
+          getProfile();
+          emit(ShopUpdateProfileSuccessState(updateProfileModel!));
+        })
+        .catchError((error) {
+          emit(ShopUpdateProfileErrorState(error.toString()));
+          debugPrint(error.toString());
+        });
+  }
+
+  ProductDetailsModel? productDetailsModel;
+
+  void getProductDetails(int id)
+  {
+    emit(ShopGetProductDetailsLoadingState());
+
+    ShopHelper.getData(
+        url: productEndPoint(id),
       token: token,
-    ).then((value) {
-      profileModel = ProfileModel.fromJson(value.data);
-      debugPrint('The profile is: ${value.data}');
-      emit(ShopGetProfileSuccessState());
-    }).catchError((error) {
-      emit(ShopGetProfileErrorState(error.toString()));
+      lang: language,
+    ).then((value){
+      productDetailsModel = ProductDetailsModel.fromJson(value.data);
+      debugPrint('The product details is : ${value.data}');
+      emit(ShopGetProductDetailsSuccessState());
+    }).catchError((error){
+      emit(ShopGetProductDetailsErrorState(error.toString()));
       debugPrint(error.toString());
     });
   }

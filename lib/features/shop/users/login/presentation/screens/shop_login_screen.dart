@@ -5,12 +5,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:swd4_s1/core/layout/shop/shop_layout.dart';
 import 'package:swd4_s1/core/shared/const/constanse.dart';
 import 'package:swd4_s1/core/shared/network/local/cache_helper.dart';
+import 'package:swd4_s1/core/shared/themes/controller/cubit.dart';
 import 'package:swd4_s1/core/shared/widgets/my_button.dart';
 import 'package:swd4_s1/core/shared/widgets/my_from_field.dart';
 import 'package:swd4_s1/core/shared/widgets/my_txt_button.dart';
 import 'package:swd4_s1/core/shared/widgets/toast_state.dart';
 import 'package:swd4_s1/features/shop/users/login/presentation/controller/cubit.dart';
 import 'package:swd4_s1/features/shop/users/login/presentation/controller/state.dart';
+import 'package:swd4_s1/main.dart';
 
 class ShopLoginScreen extends StatelessWidget {
   const ShopLoginScreen({super.key});
@@ -32,10 +34,14 @@ class ShopLoginScreen extends StatelessWidget {
                   value: state.loginModel.data!.token,
               ).then((value){
                     if(value){
-                      Navigator.pushReplacement(
+                      if(context.mounted) {
+                        Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => ShopLayout()),
+                        MaterialPageRoute(builder: (context) => MyApp(
+                            isDark: ThemeModeCubit.get(context).isDark,
+                            startWidget: ShopLayout(),),),
                       );
+                      }
                     }
                     token = state.loginModel.data!.token;
               });

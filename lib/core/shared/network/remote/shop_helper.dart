@@ -16,14 +16,14 @@ class ShopHelper {
     required String url,
     Map<String, dynamic>? query,
     Map<String, dynamic>? data,
-    String lang = 'en',
+    String? lang,
     String? token,
   })
   async {
     dio.options.headers =
     {
       'Content-Type' : 'application/json',
-      'lang' : lang,
+      'lang' : lang ?? '',
       'Authorization' : token ?? '',
     };
     return dio.get(
@@ -37,14 +37,14 @@ class ShopHelper {
     required String url,
     Map<String, dynamic>? query,
     required Map<String, dynamic> data,
-    String lang = 'en',
+    String? lang,
     String? token,
   })
   async {
     dio.options.headers =
     {
       'Content-Type' : 'application/json',
-      'lang' : lang,
+      'lang' : lang ?? '',
       'Authorization' : token ?? '',
     };
     return dio.post(
@@ -58,14 +58,14 @@ class ShopHelper {
     required String url,
     Map<String, dynamic>? query,
     required Map<String, dynamic> data,
-    String lang = 'en',
+    String? lang,
     String? token,
   })
   async {
     dio.options.headers =
     {
       'Content-Type' : 'application/json',
-      'lang' : lang,
+      'lang' : lang ?? '',
       'Authorization' : token ?? '',
     };
     return dio.put(
